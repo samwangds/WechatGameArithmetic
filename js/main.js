@@ -199,22 +199,37 @@ export default class Main {
     let self = this
     let restart = self.restart.bind(self)
     let continueGame = self.continueGame.bind(self)
-    wx.showModal({
+    let modal = {
       title: '游戏结束',
-      content: '观看广告可继续答题',
       cancelText: '重新开始',
       confirmText:'继续答题',
       success(res) {
         if (res.confirm) {
           console.log('用户点击确定')
-          self.continueGame()
+          if (databus.continueUsed){
+            restart()
+          } else {
+            databus.continueUsed = true
+            self.continueGame()
+          }
+          
         } else if (res.cancel) {
           console.log('用户点击取消')
           restart()
         }
       }
+  }
 
-    })
+    if (databus.continueUsed) {
+      modal.content = '点击重新开始游戏'
+      modal.showCancel = false
+      modal.confirmText = '重新开始'
+    } else {
+      modal.content = '每局可继续答题1次'
+    }
+
+
+  wx.showModal(modal)
 
   }
 

@@ -23,6 +23,7 @@ export default class DataBus {
     this.gameOver = false
     this.startGame = false
     this.randomQuestionInfo()
+    this.continueUsed = false //继续游戏是否已经用过
   }
 
   updateScore(score) {
