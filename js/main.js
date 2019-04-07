@@ -3,6 +3,8 @@ import QuestionText from './view/QuestionText'
 import BottomButton from './view/BottomButton'
 import VersionCompat from './base/versionCompat'
 import Progress from './view/Progress'
+import LevelButton from './view/LevelButton'
+
 
 let ctx   = canvas.getContext('2d')
 let databus = new DataBus() 
@@ -35,6 +37,12 @@ export default class Main {
         } else if(type == 2) {
           submitAnswer(false)
         }
+
+        type = self.levelButton.touchEventType(x, y)
+        if(type >= 0 && type != databus.level) {
+            databus.updateLevel(type)
+            self.restart()
+        }
       } 
 
     })
@@ -50,8 +58,9 @@ export default class Main {
     })
     wx.getStorage({
       key: 'highScore',
-      success: function ({ data }) {
-        // console.log(data)
+      success: function (obj) {
+        let { data } = obj
+        console.log(obj)
         if (data == undefined) {
           data = 0
         }
@@ -64,6 +73,24 @@ export default class Main {
         self.start()
       }
     })
+
+    wx.getStorage({
+      key: 'level',
+      success: function (obj) {
+        let { data } = obj
+        console.log(obj)
+        if (data == undefined) {
+          data = 0
+        }
+        databus.level = data
+      },
+      fail: function () { },
+      complete: function () { 
+        self.start()
+      }
+    })
+
+
 
   }
 
@@ -88,6 +115,8 @@ export default class Main {
     this.qeustionText = new QuestionText()
     this.bottomButton = new BottomButton()
     this.progress = new Progress(ctx)
+    this.levelButton = new LevelButton()
+
   }
 
   //开始，未循环
@@ -138,8 +167,9 @@ export default class Main {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     //背景
     ctx.fillStyle = '#c2eef0' 
-    ctx.fillRect(0, 0, canvas.width, canvas.height )
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
     this.qeustionText.render(ctx, databus)
+    this.levelButton.render(ctx, databus)
     this.bottomButton.render(ctx)
     this.progress.render()
     
@@ -150,7 +180,7 @@ export default class Main {
   submitAnswer(answer) {
     databus.startGame = true
     if (answer == databus.questionInfo.rightAnswer) {
-      databus.updateScore(databus.score+1)
+      databus.updateScore(databus.score + 1 + databus.level)
       databus.randomQuestionInfo()
       this.progress.resetProgress()
       if (databus.startGame) {

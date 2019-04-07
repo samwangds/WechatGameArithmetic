@@ -44,7 +44,6 @@ export default class QuestionText {
     ctx.fillText("最好成绩: " + databus.highScore, 10, this.tilteTextY)
     ctx.fillText("成　　绩: " + databus.score, 10, this.tilteTextYLine2)
     
-
   }
  
 }
