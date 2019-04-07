@@ -20,6 +20,7 @@ export default class DataBus {
   reset() {
     this.score      = 0
     this.gameOver = false
+    this.startGame = false
     this.randomQuestionInfo()
   }
 
